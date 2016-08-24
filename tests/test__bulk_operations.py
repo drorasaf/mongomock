@@ -1,7 +1,4 @@
-try:
-    import unittest.mock as mock
-except:
-    import mock
+import mock
 import mongomock
 
 try:
