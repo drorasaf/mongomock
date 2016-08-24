@@ -1549,6 +1549,7 @@ class MongoClientAggregateTest(_CollectionComparisonTest):
         ]
         self.cmp.compare.aggregate(pipeline)
 
+
 def _LIMIT(*args):
     return lambda cursor: cursor.limit(*args)
 
