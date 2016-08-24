@@ -86,24 +86,17 @@ class CollectionAPITest(TestCase):
         self.db.collection.insert({'f1': {'f2': 'v'}})
         cursor = self.db.collection.find()
         self.assertEqual(cursor.distinct('f1.f2'), ['v'])
-        self.assertEqual(self.db.collection.distinct('f1.f2'), ['v'])
 
     def test__distinct_array_field(self):
         self.db.collection.insert(
             [{'f1': ['v1', 'v2', 'v1']}, {'f1': ['v2', 'v3']}])
         cursor = self.db.collection.find()
         self.assertEqual(set(cursor.distinct('f1')), set(['v1', 'v2', 'v3']))
-        self.assertEqual(set(self.db.collection.distinct('f1')), set(['v1', 'v2', 'v3']))
 
     def test__distinct_document_field(self):
         self.db.collection.insert({'f1': {'f2': 'v2', 'f3': 'v3'}})
         cursor = self.db.collection.find()
         self.assertEqual(cursor.distinct('f1'), [{'f2': 'v2', 'f3': 'v3'}])
-        self.assertEqual(self.db.collection.distinct('f1'), [{'f2': 'v2', 'f3': 'v3'}])
-
-    def test__distinct_filter_field(self):
-        self.db.collection.insert([{'f1': 'v1', 'k1': 'v1'}, {'f1': 'v2', 'k1': 'v1'}, {'f1': 'v3', 'k1': 'v2'}])
-        self.assertEqual(set(self.db.collection.distinct('f1', {'k1': 'v1'})), set(['v1', 'v2']))
 
     def test__cursor_clone(self):
         self.db.collection.insert([{"a": "b"}, {"b": "c"}, {"c": "d"}])
