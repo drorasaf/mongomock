@@ -1388,7 +1388,7 @@ class Collection(object):
                         if field == '_id':
                             continue
                         for func, key in iteritems(value):
-                            if func in ("$sum", "$avg"):
+                            if func in ("$sum", "$avg", "$last", "$first"):
                                 if len(group_func_keys) == 0:
                                     grouped = itertools.groupby(out_collection)
                                 else:
@@ -1427,6 +1427,22 @@ class Collection(object):
                                                                doc.get(from_field, 0)])
                                         current_avg = current_val / max(len(group_list), 1)
                                         doc_dict[field] = current_avg
+                                    elif func == "$last":
+                                        for doc in group_list:
+                                            max_time = datetime.min
+                                            current_time = doc.get(from_field, datetime.min)
+                                            if not isinstance(current_time, datetime):
+                                                raise ValueError("field is not a timestamp")
+                                            max_time = max(max_time, current_time)
+                                        doc_dict[field] = max_time
+                                    elif func == "$first":
+                                        min_time = datetime.max
+                                        for doc in group_list:
+                                            current_time = doc.get(from_field, datetime.max)
+                                            if not isinstance(current_time, datetime):
+                                                raise ValueError("field is not a timestamp")
+                                            min_time = min(min_time, current_time)
+                                        doc_dict[field] = min_time
 
                                     if new_doc:
                                         grouped_collection.append(doc_dict)
@@ -1435,7 +1451,7 @@ class Collection(object):
                                     raise NotImplementedError(
                                         "Although %s is a valid group operator for the "
                                         "aggregation pipeline, %s is currently not implemented "
-                                        "in Mongomock." % func)
+                                        "in Mongomock." % (func, func))
                                 else:
                                     raise NotImplementedError(
                                         "%s is not a valid group operator for the aggregation "
